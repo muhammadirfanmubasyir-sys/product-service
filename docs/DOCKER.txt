@@ -1,0 +1,40 @@
+$ maven clean verify
+
+$ docker compose up -d
+$ docker compose down
+
+$ docker compose down --rmi all
+
+$ docker images
+                                                                                                                                                                i Info →   U  In Use
+IMAGE                        ID             DISK USAGE   CONTENT SIZE   EXTRA
+mongo:7.0.5                  5a54d0323fe2       1.03GB          261MB    U
+mongo:latest                 d6b569590880       1.26GB          330MB
+testcontainers/ryuk:0.13.0   31b31269d066       14.4MB         7.21MB
+
+$ docker rmi 5a54d0323fe2
+
+$ docker run -it --rm  mongo:7.0.5	-p 27017:27017
+
+$ docker ps
+CONTAINER ID   IMAGE         COMMAND                  CREATED        STATUS        PORTS                                             NAMES
+5b6df90648ff   mongo:7.0.5   "docker-entrypoint.s…"   17 hours ago   Up 17 hours   0.0.0.0:27017->27017/tcp, [::]:27017->27017/tcp   mongodb
+
+$ docker stop 5b6df90648ff
+5b6df90648ff
+
+$ docker rm 5b6df90648ff
+5b6df90648ff
+
+$ docker inspect 5b6df90648ff
+
+$ docker logs --since=1h 5b6df90648ff
+
+$ docker exec -it 5b6df90648ff bash
+
+$ aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 062735499656.dkr.ecr.ap-southeast-1.amazonaws.com/srin-ecr-online-boutique
+$ docker push 062735499656.dkr.ecr.ap-southeast-1.amazonaws.com/srin-ecr-online-boutique:nginx
+
+$ docker pull gcr.io/google-samples/microservices-demo/frontend:v0.9.0
+
+$ docker run -d --env-file frontend.env gcr.io/google-samples/microservices-demo/frontend:v0.9.0

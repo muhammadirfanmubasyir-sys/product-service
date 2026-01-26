@@ -25,17 +25,20 @@ public class ProductService {
                 .build();
 
         Product newProduct = productRepository.save(product);
-        log.info("PRODUCT IS CREATED SUCCESSFULLY !");
+        log.info("PRODUCT IS CREATED SUCCESSFULLY, ID = " +  newProduct.getId());
 
         return new ProductResponse(newProduct.getId(), newProduct.getName(), newProduct.getDescription(), newProduct.getPrice());
 
     }
 
     public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll()
+        List<ProductResponse> productResponseList =
+                productRepository.findAll()
                 .stream()
                 .map(product -> new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice()))
                 .toList();
 
+        log.info("productResponseList SIZE =" + productResponseList.size());
+        return productResponseList;
     }
 }

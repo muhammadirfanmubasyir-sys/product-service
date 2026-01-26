@@ -1,7 +1,9 @@
 package com.irfan.microservices.product;
 
 import com.irfan.microservices.product.dto.ProductRequest;
-import com.irfan.microservices.product.model.Product;
+import com.irfan.microservices.product.repository.ProductRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,12 +43,16 @@ class ProductServiceApplicationTests {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private ProductRepository productRepository;
+
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry dynamicPropertyRegistry) {
         dynamicPropertyRegistry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
     }
 
     @Test
+    @Order(1000)
     void shouldCreateProduct() throws Exception {
         ProductRequest productRequest = this.getProductRequest();
         String productRequestString = objectMapper.writeValueAsString(productRequest);
@@ -58,6 +64,18 @@ class ProductServiceApplicationTests {
                         )
                 .andExpect(status().isCreated())
                 .andDo(print());
+
+        Assertions.assertFalse(productRepository.findAll().isEmpty());
+    }
+
+    @Test
+    @Order(2000)
+    void shouldGetProduct() throws Exception {
+        mockMvc.perform(get("/api/product"))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        Assertions.assertFalse(productRepository.findAll().isEmpty());
     }
 
     private ProductRequest getProductRequest() {

@@ -1,7 +1,7 @@
-version: '4'
 services:
   mongodb:
     image: mongo:latest
+    pull_policy: missing
     container_name: mongodb
     ports:
       - "27017:27017"
@@ -11,5 +11,57 @@ services:
       MONGO_INITDB_DATABASE: product-service
     volumes:
       - mongo-data:/data/db
+  elasticsearch:
+    image: elasticsearch:8.17.1
+    pull_policy: missing
+    container_name: elasticsearch
+    restart: always
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data/
+    environment:
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xmx256m -Xms256m
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    networks:
+      - elk-network
+  logstash:
+    image: logstash:8.17.1
+    pull_policy: missing
+    container_name: logstash
+    restart: always
+    volumes:
+      # Mount the local config file into the container's pipeline folder
+      - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    environment:
+      - LS_JAVA_OPTS=-Xmx256m -Xms256m
+      - xpack.monitoring.enabled=true
+    networks:
+      - elk-network
+  kibana:
+    image: kibana:8.17.1
+    pull_policy: missing
+    container_name: kibana
+    restart: always
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk-network
+
 volumes:
   mongo-data:
+  elastic_data: {}
+
+networks:
+  elk-network:
+    driver: bridge

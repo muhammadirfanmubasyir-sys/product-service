@@ -1,0 +1,83 @@
+
+$ docker compose up -d
+[+] up 6/6
+ ✔ Network product-service_elk-network Created                                                                                                                                                                                         0.0s
+ ✔ Network product-service_default     Created                                                                                                                                                                                         0.0s
+ ✔ Container mongodb                   Created                                                                                                                                                                                         0.1s
+ ✔ Container elasticsearch             Created                                                                                                                                                                                         0.1s
+ ✔ Container kibana                    Created                                                                                                                                                                                         0.1s
+ ✔ Container logstash                  Created                                                                                                                                                                                         0.1s
+
+$ docker ps
+CONTAINER ID   IMAGE                    COMMAND                  CREATED          STATUS          PORTS                                                                                                                                  NAMES
+2c3251e5edc3   kibana:8.17.1            "/bin/tini -- /usr/l…"   27 minutes ago   Up 27 minutes   0.0.0.0:5601->5601/tcp, [::]:5601->5601/tcp                                                                                            kibana
+01fcacef49f7   logstash:8.17.1          "/usr/local/bin/dock…"   27 minutes ago   Up 27 minutes   5044/tcp, 9600/tcp, 0.0.0.0:5555->5555/tcp, [::]:5555->5555/tcp                                                                        logstash
+51d60fbd066e   elasticsearch:8.17.1     "/bin/tini -- /usr/l…"   27 minutes ago   Up 27 minutes   0.0.0.0:9200->9200/tcp, [::]:9200->9200/tcp, 9300/tcp                                                                                  elasticsearch
+4fb4d325a69d   mongo:latest             "docker-entrypoint.s…"   27 minutes ago   Up 27 minutes   0.0.0.0:27017->27017/tcp, [::]:27017->27017/tcp                                                                                        mongodb
+a7ca77efb6cf   kicbase/stable:v0.0.49   "/usr/local/bin/entr…"   8 weeks ago      Up 6 hours      127.0.0.1:32768->22/tcp, 127.0.0.1:32769->2376/tcp, 127.0.0.1:32770->5000/tcp, 127.0.0.1:32771->8443/tcp, 127.0.0.1:32772->32443/tcp   minikube
+
+# CHECK ELASTIC SEARCH CONNECTED WITH LOGSTASH
+# List Indices: Check if the expected index exists - created by Logstash
+$ curl -XGET 'http://localhost:9200/_cat/indices?v'
+health status index                                                              uuid                   pri rep docs.count docs.deleted store.size pri.store.size dataset.size
+green  open   .internal.alerts-transform.health.alerts-default-000001            ycsZr92GRpuA-YyLE9fWyA   1   0          0            0       249b           249b         249b
+green  open   .internal.alerts-observability.logs.alerts-default-000001          vKoXnST6Rc-wSLTlH9rIcQ   1   0          0            0       249b           249b         249b
+green  open   .internal.alerts-observability.uptime.alerts-default-000001        EPVK8dmYSW2Y8EVQt5vESg   1   0          0            0       249b           249b         249b
+green  open   .internal.alerts-ml.anomaly-detection.alerts-default-000001        8yiMnEM_QfCOA26HNvNyRg   1   0          0            0       249b           249b         249b
+green  open   .internal.alerts-observability.slo.alerts-default-000001           0C64ciDyQD2micQhcK5a5Q   1   0          0            0       249b           249b         249b
+green  open   .internal.alerts-default.alerts-default-000001                     Yilz6ZuHRSi_d_yI6-P1tA   1   0          0            0       249b           249b         249b
+green  open   .internal.alerts-observability.apm.alerts-default-000001           5gxnAp-RScCL6LulbgXxvw   1   0          0            0       249b           249b         249b
+green  open   .internal.alerts-observability.metrics.alerts-default-000001       x0Tg0_lSRpOhzVbyN1seNw   1   0          0            0       249b           249b         249b
+green  open   .internal.alerts-ml.anomaly-detection-health.alerts-default-000001 K47nyyBBTjmuGDxE4BcAFQ   1   0          0            0       249b           249b         249b
+green  open   .internal.alerts-observability.threshold.alerts-default-000001     Mxi1WnaHQ2KU08-N2rc0GA   1   0          0            0       249b           249b         249b
+yellow open   spring-boot-logs-2026.04.06                                        PaXOwOyHTxe5t3ZGA-XQfw   1   1         66            0    195.4kb        195.4kb      195.4kb
+yellow open   spring-boot-logs-2026.04.05                                        b9DNXn5lQ2aZ-oFCvqMAEA   1   1         21            0     34.4kb         34.4kb       34.4kb
+green  open   .internal.alerts-security.alerts-default-000001                    nhvzb8ZEQ7yb4fdYvaPYjw   1   0          0            0       249b           249b         249b
+green  open   .internal.alerts-stack.alerts-default-000001                       OrzRz8BmQZ-7ic-DH_EPkQ   1   0          0            0       249b           249b         249b
+
+# CHECK ELASTIC SEARCH:
+# Check Document Count: Verify if the document count is greater than zero
+$ curl -XGET 'http://localhost:9200/spring-boot-logs-2026.04.05/_count?pretty'
+{
+  "count" : 21,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  }
+}
+
+$ curl -XGET 'http://localhost:9200/spring-boot-logs-2026.04.06/_count?pretty'
+{
+  "count" : 66,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  }
+}
+
+$ curl -XGET 'http://localhost:9200/spring-boot-logs-2026.04.05/_search?size=1'
+{"took":1,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":{"value":267,"relation":"eq"},"max_score":1.0,"hits":[{"_index":"spring-boot-logs-2026.04.06","_id":"YC0jYp0ByEAxSH4FicD1","_score":1.0,"_source":{"message":"PRODUCT IS CREATED SUCCESSFULLY, ID = 69d37dd4bf038ecd7cd8be8b","level":"INFO","@version":"1","application":"spring-boot-app","logger_name":"com.irfan.microservices.product.service.ProductService","@timestamp":"2026-04-06T09:33:08.980270800Z","thread_name":"http-nio-8080-exec-10","level_value":20000}}]}}
+
+$ curl -XGET 'http://localhost:9200/spring-boot-logs-2026.04.06/_search?size=1'
+{"took":1,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":{"value":21,"relation":"eq"},"max_score":1.0,"hits":[{"_index":"spring-boot-logs-2026.04.05","_id":"dRJlW50B-u7gp1BlxUHs","_score":1.0,"_source":{"message":"PRODUCT IS CREATED SUCCESSFULLY, ID = 69d1c40998fa7f2b3471e221","@version":"1","@timestamp":"2026-04-05T02:08:09.595497100Z","level_value":20000,"logger_name":"com.irfan.microservices.product.service.ProductService","level":"INFO","thread_name":"http-nio-8080-exec-2"}}]}}
+
+# CHECK ELASTIC SEARCH CONNECTED WITH KIBANA
+OPEN KIBANA UI:  http://localhost:5601/status or curl -X GET "http://localhost:5601/api/status"
+- Check 'Core status' is GREEN
+- Check 'Plugin status' is GREEN
+
+logback-spring.xml
+==================
+output {
+    elasticsearch {
+        hosts => ["http://elasticsearch:9200"]
+        index => "spring-boot-index-logs-%{+YYYY.MM.dd}"
+    }
+    stdout {
+        codec => rubydebug
+    }
+}

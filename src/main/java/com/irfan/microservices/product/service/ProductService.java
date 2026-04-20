@@ -43,4 +43,16 @@ public class ProductService {
         log.info("productResponseList SIZE =" + productResponseList.size());
         return productResponseList;
     }
+
+    public List<ProductResponse> findProductByName(String productName) {
+        List<Product> lisOfProduct = productRepository.findByName(productName)
+                                        .orElseThrow(() -> new RuntimeException("Product Not Found"));
+
+        List<ProductResponse> productResponseList = lisOfProduct.stream()
+                                                                .map(product -> new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice()))
+                                                                .toList();
+
+        log.info("findProductByName [" + productName + "] SIZE =" + productResponseList.size());
+        return productResponseList;
+    }
 }

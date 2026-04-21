@@ -1,26 +1,52 @@
-db.createUser({
-user: "mongouser”,
-pwd: "mongopassword",
-roles: [
-{
-role: "readWrite",
-db: "testdb"
-},
-],
-});
-
-------------------------
+Clear Console: Ctrl + L
+=======================
 use admin
 db.createUser(
   {
     user: "mongouser",
     pwd: "mongopassword",
     roles: [ { role: "userAdminAnyDatabase", db: "admin" },
+             { role: "userAdminAnyDatabase", db: "test" },
 	          "readWriteAnyDatabase" ]
   }
 )
+show collections
+================
+system.users
+system.version
 
-
+db.system.users.find({})
+=======================
+{
+  _id: 'admin.mongouser',
+  userId: UUID('c67957c2-a26a-4f1c-83dc-980f7166de21'),
+  user: 'mongouser',
+  db: 'admin',
+  credentials: {
+    'SCRAM-SHA-1': {
+      iterationCount: 10000,
+      salt: 'bR9X1KzrNcQZ0QoK/Vtvlg==',
+      storedKey: 'edeAKD5Sf79amu7Dhh2NFMYI15Y=',
+      serverKey: 'C0ao0HLNCNXiz80l+afvXYQ9t4g='
+    },
+    'SCRAM-SHA-256': {
+      iterationCount: 15000,
+      salt: 'Y/4DvryG56CZoTQ1vhu4TzdhFrHQT8TFix4ZkQ==',
+      storedKey: '1uTlBIli8GQKTwsn3KLu0qa6d0gKNgdFvrCuf974JXc=',
+      serverKey: 'z03VqjI/c/dHPiQN5GuORX+qHfpmjGlqv+OzMZ7NrnM='
+    }
+  },
+  roles: [
+    {
+      role: 'readWriteAnyDatabase',
+      db: 'admin'
+    },
+    {
+      role: 'userAdminAnyDatabase',
+      db: 'admin'
+    }
+  ]
+}
 -------------------------------------------------------
 db.getUser("mongouser")
 {
@@ -40,15 +66,8 @@ db.grantRolesToUser(
 -------------------------------------
 db.auth('mongouser', 'mongopassword')
 -------------------------------------
-db.getUser("mongouser")
-{
-  _id: 'admin.mongouser',
-  userId: UUID('af2ce4c6-b285-42bb-a9d8-0f18c2ed7e31'),
-  user: 'mongouser',
-  db: 'admin',
-  roles: [ { role: 'readWrite', db: 'testdb' }, { role: 'root', db: 'admin' } ],
-  mechanisms: [ 'SCRAM-SHA-1', 'SCRAM-SHA-256' ]
-}
+ { ok: 1 }
+
 ------------------------------------------------------------
 mongosh --port 27017 -u mongouser -p 'mongopassword' --authenticationDatabase 'admin'
 
@@ -59,13 +78,4 @@ db.product.insert( { id: "2", name: "Iphone 17", description: "OK", price: 7000 
 
 db.product.find({id : "2"})
 
-
-use admin
-db.createUser(
-  {
-    user: "",
-    pwd: "pass123",
-    roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]
-  }
-)
 

@@ -4,11 +4,10 @@ services:
     pull_policy: missing
     container_name: mongodb
     ports:
-      - "27017:27017"
+      - "33333:27017"
     environment:
-  #    MONGO_INITDB_ROOT_USERNAME: mongouser
-  #    MONGO_INITDB_ROOT_PASSWORD: mongopassword
-      MONGO_INITDB_DATABASE: product-service
+      MONGO_INITDB_ROOT_USERNAME: mongouser
+      MONGO_INITDB_ROOT_PASSWORD: mongopassword
     volumes:
       - mongo-data:/data/db
   elasticsearch:

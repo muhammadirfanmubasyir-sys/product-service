@@ -35,9 +35,22 @@ public class ProductController {
     }
 
     @Operation(
+            summary = "Update A Product - Rest API",
+            description = "Got A Best Job, Alhamdulillah!"
+    )
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductResponse updateProduct(@PathVariable("id") String productId,
+                                         @RequestBody ProductRequest productRequest) {
+        return productService.updateProduct(productId, productRequest);
+    }
+
+    @Operation(
             summary = "Get All Product - Rest API",
             description = "Got A Best Job, Alhamdulillah!"
     )
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ProductResponse> getAllProducts() {
@@ -45,12 +58,19 @@ public class ProductController {
     }
 
     @Operation(
-            summary = "Find Product By Name - Rest API",
+            summary = "Find Product By Id - Rest API",
             description = "Got A Best Job, Alhamdulillah!"
     )
-    @GetMapping("/find")
+
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public List<ProductResponse> findProductByName(@RequestParam("product-name") String productName) {
-        return productService.findProductByName(productName);
+    public ProductResponse findProductById(@PathVariable("id") String productId) {
+        return productService.findProductById(productId);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteProduct(@PathVariable("id") String productId) {
+        productService.deleteProductById(productId);
     }
 }

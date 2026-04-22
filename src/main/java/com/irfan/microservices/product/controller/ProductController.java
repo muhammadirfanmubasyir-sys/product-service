@@ -61,13 +61,16 @@ public class ProductController {
             summary = "Find Product By Id - Rest API",
             description = "Got A Best Job, Alhamdulillah!"
     )
-
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ProductResponse findProductById(@PathVariable("id") String productId) {
         return productService.findProductById(productId);
     }
 
+    @Operation(
+            summary = "Delete Product - Rest API",
+            description = "Got A Best Job, Alhamdulillah!"
+    )
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteProduct(@PathVariable("id") String productId) {

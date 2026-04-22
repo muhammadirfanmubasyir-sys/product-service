@@ -2,6 +2,7 @@ package com.irfan.microservices.product.service;
 
 import com.irfan.microservices.product.dto.ProductRequest;
 import com.irfan.microservices.product.dto.ProductResponse;
+import com.irfan.microservices.product.exception.ResourceNotFoundException;
 import com.irfan.microservices.product.model.Product;
 import com.irfan.microservices.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,13 +47,38 @@ public class ProductService {
 
     public List<ProductResponse> findProductByName(String productName) {
         List<Product> lisOfProduct = productRepository.findByName(productName)
-                                        .orElseThrow(() -> new RuntimeException("Product Not Found"));
+                                        .orElseThrow(() -> new ResourceNotFoundException("Product With Name: " + productName + " Is Not Found"));
 
         List<ProductResponse> productResponseList = lisOfProduct.stream()
                                                                 .map(product -> new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice()))
                                                                 .toList();
-
         log.info("findProductByName [" + productName + "] SIZE =" + productResponseList.size());
         return productResponseList;
+    }
+    public ProductResponse findProductById(String productId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product With Id: " + productId + " Is Not Found"));
+
+        return new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice());
+    }
+
+    public ProductResponse updateProduct(String productId, ProductRequest productRequest) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product With Id: " + productId + " Is Not Found"));
+
+        product.setName(productRequest.name());
+        product.setPrice(productRequest.price());
+        product.setDescription(productRequest.description());
+
+        Product updatedProduct = productRepository.save(product);
+        log.info("PRODUCT IS UPDATED SUCCESSFULLY, ID = " +  updatedProduct.getId());
+
+        return new ProductResponse(updatedProduct.getId(), updatedProduct.getName(), updatedProduct.getDescription(), updatedProduct.getPrice());
+
+    }
+
+    public void deleteProductById(String productId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product With Id: " + productId + " Is Not Found"));
+
+        productRepository.deleteById(product.getId());
+
     }
 }

@@ -12,4 +12,6 @@ import java.util.List;
 public interface ProductRepository extends MongoRepository<Product, String> {
    // @Query("select p from Product p where p.name = ?1")
     Optional<List<Product>> findByName(String productName);
+
+    Optional<Product> findById(String productId);
 }

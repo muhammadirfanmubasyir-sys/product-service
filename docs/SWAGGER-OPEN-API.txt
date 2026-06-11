@@ -1,0 +1,4 @@
+TO SEE
+======
+- SWAGGER UI - OPEN API: http://localhost:8080/swagger-ui/index.html
+- API DOCS - http://localhost:8080/v3/api-docs

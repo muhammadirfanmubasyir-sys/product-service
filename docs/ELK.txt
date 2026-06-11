@@ -73,7 +73,7 @@ OPEN KIBANA UI:  http://localhost:5601/status or curl -X GET "http://localhost:5
 logback-spring.xml
 ==================
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>localhost:5044</destination>
+        <destination>logstash:5044</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <customFields>{"app":"spring-boot-elk-demo","environment":"development"}</customFields>
         </encoder>
@@ -107,3 +107,27 @@ output {
         codec => rubydebug
     }
 }
+
+OPEN KIBANA : http://localhost:5601/
+SEE : /docs/SPRING-BOOT-ELK.png
+
+=======================================
+ERROR HANDLING:
+06:39:14,526 |-WARN in net.logstash.logback.appender.LogstashTcpSocketAppender[LOGSTASH] - Log destination logstash/<unresolved>:5044: connection failed. java.net.ConnectException: Connection refused
+        at java.net.ConnectException: Connection refused
+        at      at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+        at      at java.base/sun.nio.ch.Net.pollConnectNow(Unknown Source)
+        at      at java.base/sun.nio.ch.NioSocketImpl.timedFinishConnect(Unknown Source)
+        at      at java.base/sun.nio.ch.NioSocketImpl.connect(Unknown Source)
+        at      at java.base/java.net.SocksSocketImpl.connect(Unknown Source)
+        at      at java.base/java.net.Socket.connect(Unknown Source)
+        at      at net.logstash.logback.appender.AbstractLogstashTcpSocketAppender$TcpSendingEventHandler.openSocket(AbstractLogstashTcpSocketAppender.java:765)
+        at      at net.logstash.logback.appender.AbstractLogstashTcpSocketAppender$TcpSendingEventHandler.onStart(AbstractLogstashTcpSocketAppender.java:691)
+        at      at net.logstash.logback.appender.AsyncDisruptorAppender$EventClearingEventHandler.onStart(AsyncDisruptorAppender.java:382)
+        at      at net.logstash.logback.encoder.com.lmax.disruptor.BatchEventProcessor.notifyStart(BatchEventProcessor.java:224)
+        at      at net.logstash.logback.encoder.com.lmax.disruptor.BatchEventProcessor.run(BatchEventProcessor.java:120)
+        at      at java.base/java.lang.Thread.run(Unknown Source)
+06:39:14,534 |-WARN in net.logstash.logback.appender.LogstashTcpSocketAppender[LOGSTASH] - Log destination logstash/<unresolved>:5044: Waiting 29987ms before attempting reconnection.
+
+CAUSED BY: Logstash has not been fully UP
+SOLUTION: Restart Product Service Again: docker compose restart product-service

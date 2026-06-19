@@ -8,6 +8,9 @@ import com.irfan.microservices.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +37,23 @@ public class ProductService {
 
     }
 
-    public List<ProductResponse> getAllProducts() {
+    public List<ProductResponse> getAllProducts(int page, int size, String sortBy, String direction) {
+        // Determine sorting order
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        /**  Advanced Sorting Combinations  ***
+         *
+         *   Sort multiSort = Sort.by("price").descending()
+         *                        .and(Sort.by("name").ascending());
+        **/
+
+        // Create Pageable instance (Note: Page indices are 0-based)
+        Pageable pageable = PageRequest.of(page, size, sort);
+
         List<ProductResponse> productResponseList =
-                productRepository.findAll()
+                productRepository.findAll(pageable)
                 .stream()
                 .map(product -> new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice()))
                 .toList();

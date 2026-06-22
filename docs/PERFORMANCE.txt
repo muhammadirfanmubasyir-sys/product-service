@@ -1,0 +1,119 @@
+irfan@DESKTOP-CH2QFKL:~$ sudo apt install apache2-utils
+
+irfan@DESKTOP-CH2QFKL:~$ ab -V
+This is ApacheBench, Version 2.3 <$Revision: 1903618 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+==============================================================================
+irfan@DESKTOP-CH2QFKL:~$  ab -n 1000 -c 50 http://localhost:8080/api/products
+This is ApacheBench, Version 2.3 <$Revision: 1903618 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+Completed 100 requests
+Completed 200 requests
+Completed 300 requests
+Completed 400 requests
+Completed 500 requests
+Completed 600 requests
+Completed 700 requests
+Completed 800 requests
+Completed 900 requests
+Completed 1000 requests
+Finished 1000 requests
+
+
+Server Software:
+Server Hostname:        localhost
+Server Port:            8080
+
+Document Path:          /api/products
+Document Length:        452 bytes
+
+Concurrency Level:      50
+Time taken for tests:   2.168 seconds
+Complete requests:      1000
+Failed requests:        0
+Total transferred:      646000 bytes
+HTML transferred:       452000 bytes
+Requests per second:    461.17 [#/sec] (mean)
+Time per request:       108.421 [ms] (mean)
+Time per request:       2.168 [ms] (mean, across all concurrent requests)
+Transfer rate:          290.93 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.7      0       6
+Processing:    13  101  54.2     86     331
+Waiting:       12   99  54.1     84     331
+Total:         13  101  54.2     86     331
+
+Percentage of the requests served within a certain time (ms)
+  50%     86
+  66%    119
+  75%    142
+  80%    154
+  90%    179
+  95%    196
+  98%    216
+  99%    239
+ 100%    331 (longest request
+
+ ==============================================================================
+ irfan@DESKTOP-CH2QFKL:~$  ab -n 1000 -k -c 50 http://localhost:8080/api/products
+ This is ApacheBench, Version 2.3 <$Revision: 1903618 $>
+ Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+ Licensed to The Apache Software Foundation, http://www.apache.org/
+
+ Benchmarking localhost (be patient)
+ Completed 100 requests
+ Completed 200 requests
+ Completed 300 requests
+ Completed 400 requests
+ Completed 500 requests
+ Completed 600 requests
+ Completed 700 requests
+ Completed 800 requests
+ Completed 900 requests
+ Completed 1000 requests
+ Finished 1000 requests
+
+
+ Server Software:
+ Server Hostname:        localhost
+ Server Port:            8080
+
+ Document Path:          /api/products
+ Document Length:        452 bytes
+
+ Concurrency Level:      50
+ Time taken for tests:   1.533 seconds
+ Complete requests:      1000
+ Failed requests:        0
+ Keep-Alive requests:    0
+ Total transferred:      646000 bytes
+ HTML transferred:       452000 bytes
+ Requests per second:    652.30 [#/sec] (mean)
+ Time per request:       76.651 [ms] (mean)
+ Time per request:       1.533 [ms] (mean, across all concurrent requests)
+ Transfer rate:          411.51 [Kbytes/sec] received
+
+ Connection Times (ms)
+               min  mean[+/-sd] median   max
+ Connect:        0    0   0.4      0       4
+ Processing:    10   73  35.2     69     180
+ Waiting:       10   72  35.2     67     179
+ Total:         10   73  35.2     69     180
+
+ Percentage of the requests served within a certain time (ms)
+   50%     69
+   66%     85
+   75%     97
+   80%    104
+   90%    125
+   95%    139
+   98%    155
+   99%    159
+  100%    180 (longest request)

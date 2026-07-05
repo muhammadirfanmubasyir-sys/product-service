@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">product-service</a> &gt; <a href="index.source.html" class="el_package">com.irfan.microservices.product.controller</a> &gt; <span class="el_source">ProductController.java</span></div><h1>ProductController.java</h1><pre class="source lang-java linenums">package com.irfan.microservices.product.controller;
+
+import com.irfan.microservices.product.dto.ProductRequest;
+import com.irfan.microservices.product.dto.ProductResponse;
+import com.irfan.microservices.product.model.Product;
+import com.irfan.microservices.product.service.ProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@CrossOrigin(&quot;*&quot;)
+@RestController
+@RequestMapping(&quot;/api/products&quot;)
+@RequiredArgsConstructor
+@Tag(
+    name = &quot;Product Management Controller&quot;,
+    description = &quot;To Create, Delete, Read and Update Product&quot;
+)
+public class ProductController {
+
+    private final ProductService productService;
+
+    @Operation(
+        summary = &quot;Create A Product - Rest API&quot;,
+        description = &quot;Got A Best Job, Alhamdulillah!&quot;
+    )
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductResponse createProduct(@RequestBody ProductRequest productRequest) {
+<span class="fc" id="L35">        return productService.createProduct(productRequest);</span>
+    }
+
+    @Operation(
+            summary = &quot;Update A Product - Rest API&quot;,
+            description = &quot;Got A Best Job, Alhamdulillah!&quot;
+    )
+
+    @PutMapping(&quot;/{id}&quot;)
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductResponse updateProduct(@PathVariable(&quot;id&quot;) String productId,
+                                         @RequestBody ProductRequest productRequest) {
+<span class="fc" id="L47">        return productService.updateProduct(productId, productRequest);</span>
+    }
+
+    @Operation(
+            summary = &quot;Get All Product - Rest API&quot;,
+            description = &quot;Got A Best Job, Alhamdulillah!&quot;
+    )
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List&lt;ProductResponse&gt; getAllProducts(
+            @RequestParam(defaultValue = &quot;0&quot;) int page,
+            @RequestParam(defaultValue = &quot;10&quot;) int size,
+            @RequestParam(defaultValue = &quot;id&quot;) String sortBy,
+            @RequestParam(defaultValue = &quot;asc&quot;) String direction
+    ) {
+<span class="fc" id="L63">        return productService.getAllProducts(page, size, sortBy, direction);</span>
+    }
+
+    @Operation(
+            summary = &quot;Find Product By Id - Rest API&quot;,
+            description = &quot;Got A Best Job, Alhamdulillah!&quot;
+    )
+    @GetMapping(&quot;/{id}&quot;)
+    @ResponseStatus(HttpStatus.OK)
+    public ProductResponse findProductById(@PathVariable(&quot;id&quot;) String productId) {
+<span class="fc" id="L73">        return productService.findProductById(productId);</span>
+    }
+
+    @Operation(
+            summary = &quot;Delete Product - Rest API&quot;,
+            description = &quot;Got A Best Job, Alhamdulillah!&quot;
+    )
+    @DeleteMapping(&quot;/{id}&quot;)
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteProduct(@PathVariable(&quot;id&quot;) String productId) {
+<span class="fc" id="L83">        productService.deleteProductById(productId);</span>
+<span class="fc" id="L84">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>

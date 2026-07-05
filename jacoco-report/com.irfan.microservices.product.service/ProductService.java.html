@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">product-service</a> &gt; <a href="index.source.html" class="el_package">com.irfan.microservices.product.service</a> &gt; <span class="el_source">ProductService.java</span></div><h1>ProductService.java</h1><pre class="source lang-java linenums">package com.irfan.microservices.product.service;
+
+import com.irfan.microservices.product.dto.ProductRequest;
+import com.irfan.microservices.product.dto.ProductResponse;
+import com.irfan.microservices.product.exception.ResourceNotFoundException;
+import com.irfan.microservices.product.model.Product;
+import com.irfan.microservices.product.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+<span class="fc" id="L21">@Slf4j</span>
+@Transactional
+public class ProductService {
+    private final ProductRepository productRepository;
+
+    public ProductResponse createProduct(ProductRequest productRequest) {
+<span class="fc" id="L27">        Product product = Product.builder()</span>
+<span class="fc" id="L28">                .name(productRequest.name())</span>
+<span class="fc" id="L29">                .description(productRequest.description())</span>
+<span class="fc" id="L30">                .price(productRequest.price())</span>
+<span class="fc" id="L31">                .build();</span>
+
+<span class="fc" id="L33">        Product newProduct = productRepository.save(product);</span>
+<span class="fc" id="L34">        log.info(&quot;PRODUCT IS CREATED SUCCESSFULLY, ID = &quot; +  newProduct.getId());</span>
+
+<span class="fc" id="L36">        return new ProductResponse(newProduct.getId(), newProduct.getName(), newProduct.getDescription(), newProduct.getPrice());</span>
+
+    }
+
+    public List&lt;ProductResponse&gt; getAllProducts(int page, int size, String sortBy, String direction) {
+        // Determine sorting order
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name())</span>
+<span class="fc" id="L43">                ? Sort.by(sortBy).ascending()</span>
+<span class="fc" id="L44">                : Sort.by(sortBy).descending();</span>
+
+        /**  Advanced Sorting Combinations  ***
+         *
+         *   Sort multiSort = Sort.by(&quot;price&quot;).descending()
+         *                        .and(Sort.by(&quot;name&quot;).ascending());
+        **/
+
+        // Create Pageable instance (Note: Page indices are 0-based)
+<span class="fc" id="L53">        Pageable pageable = PageRequest.of(page, size, sort);</span>
+
+<span class="fc" id="L55">        List&lt;ProductResponse&gt; productResponseList =</span>
+<span class="fc" id="L56">                productRepository.findAll(pageable)</span>
+<span class="fc" id="L57">                .stream()</span>
+<span class="fc" id="L58">                .map(product -&gt; new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice()))</span>
+<span class="fc" id="L59">                .toList();</span>
+
+<span class="fc" id="L61">        log.info(&quot;productResponseList SIZE =&quot; + productResponseList.size());</span>
+<span class="fc" id="L62">        return productResponseList;</span>
+    }
+
+    public List&lt;ProductResponse&gt; findProductByName(String productName) {
+<span class="fc" id="L66">        List&lt;Product&gt; lisOfProduct = productRepository.findByName(productName)</span>
+<span class="fc" id="L67">                                        .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product With Name: &quot; + productName + &quot; Is Not Found&quot;));</span>
+
+<span class="fc" id="L69">        List&lt;ProductResponse&gt; productResponseList = lisOfProduct.stream()</span>
+<span class="fc" id="L70">                                                                .map(product -&gt; new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice()))</span>
+<span class="fc" id="L71">                                                                .toList();</span>
+<span class="fc" id="L72">        log.info(&quot;findProductByName [&quot; + productName + &quot;] SIZE =&quot; + productResponseList.size());</span>
+<span class="fc" id="L73">        return productResponseList;</span>
+    }
+    public ProductResponse findProductById(String productId) {
+<span class="fc" id="L76">        Product product = productRepository.findById(productId).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product With Id: &quot; + productId + &quot; Is Not Found&quot;));</span>
+
+<span class="fc" id="L78">        return new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice());</span>
+    }
+
+    public ProductResponse updateProduct(String productId, ProductRequest productRequest) {
+<span class="fc" id="L82">        Product product = productRepository.findById(productId).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product With Id: &quot; + productId + &quot; Is Not Found&quot;));</span>
+
+<span class="fc" id="L84">        product.setName(productRequest.name());</span>
+<span class="fc" id="L85">        product.setPrice(productRequest.price());</span>
+<span class="fc" id="L86">        product.setDescription(productRequest.description());</span>
+
+<span class="fc" id="L88">        Product updatedProduct = productRepository.save(product);</span>
+<span class="fc" id="L89">        log.info(&quot;PRODUCT IS UPDATED SUCCESSFULLY, ID = &quot; +  updatedProduct.getId());</span>
+
+<span class="fc" id="L91">        return new ProductResponse(updatedProduct.getId(), updatedProduct.getName(), updatedProduct.getDescription(), updatedProduct.getPrice());</span>
+
+    }
+
+    public void deleteProductById(String productId) {
+<span class="fc" id="L96">        Product product = productRepository.findById(productId).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Product With Id: &quot; + productId + &quot; Is Not Found&quot;));</span>
+
+<span class="fc" id="L98">        productRepository.deleteById(product.getId());</span>
+
+<span class="fc" id="L100">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.15.202606040825</span></div></body></html>
